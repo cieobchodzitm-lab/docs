@@ -7,14 +7,17 @@ versions:
 topics:
   - Copilot
 children:
-  - /copilot-billing
   - /cheat-sheet
-  - /keyboard-shortcuts
-  - /policy-conflicts
   - /ai-models
-  - /allowlist-reference
-  - /extensions-glossary
+  - /keyboard-shortcuts
+  - /custom-agents-configuration
+  - /policy-conflicts
+  - /copilot-allowlist-reference
+  - /mcp-allowlist-enforcement
   - /metrics-data
+  - /copilot-billing
+  - /agentic-audit-log-events
+  - /review-excluded-files
+  - /copilot-usage-metrics
 contentType: reference
 ---
-

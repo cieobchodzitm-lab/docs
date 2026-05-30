@@ -15,7 +15,7 @@ shortTitle: Limits
 
 You may be rate limited by {% data variables.product.prodname_actions %} when you scale your usage. Some limits can be increased by contacting {% data variables.contact.contact_support %}.
 
-Unless otherwise stated, the expected behaviour when a limit is reached is that the workflow/job will get cancelled.
+Unless otherwise stated, the expected behavior when a limit is reached is that the workflow/job will get cancelled.
 
 These limits are subject to change.
 
@@ -61,13 +61,13 @@ These limits are subject to change.
 
 {% data variables.product.github %} Support **cannot** increase storage limits for {% data variables.product.prodname_actions %}.
 
-| {% data variables.product.github %} plan | Storage | Minutes (per month)|
-|------- | ------- | ---------|
-| {% data variables.product.prodname_free_user %} | 500 MB | 2,000 |
-| {% data variables.product.prodname_pro %} | 1 GB | 3,000 |
-| {% data variables.product.prodname_free_team %} for organizations | 500 MB | 2,000 |
-| {% data variables.product.prodname_team %} | 2 GB | 3,000 |
-| {% data variables.product.prodname_ghe_cloud %} | 50 GB | 50,000 |
+{% data reusables.billing.actions-included-quotas %}
+
+{% ifversion fpt or ghec %}
+
+For information about cache storage limits and how to increase them, see [Usage limits and eviction policy](/actions/reference/workflows-and-actions/dependency-caching#usage-limits-and-eviction-policy).
+
+{% endif %}
 
 ### Private IP scaling for vnet injection on larger runners
 

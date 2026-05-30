@@ -1,7 +1,7 @@
 ---
 title: Handling API rate limits
 shortTitle: Handle API rate limits
-intro: '{% data variables.copilot.copilot_chat_short %} can help handle API  rate limits by suggesting code that detects implements retry logic.'
+intro: '{% data variables.copilot.copilot_chat_short %} can help handle API rate limits by suggesting code that detects them and implements retry logic.'
 redirect_from:
   - /copilot/example-prompts-for-github-copilot-chat/debugging-errors/handling-api-rate-limits
   - /copilot/copilot-chat-cookbook/debugging-errors/handling-api-rate-limits
@@ -11,6 +11,7 @@ versions:
   feature: copilot
 category:
   - Debugging code
+  - Author and optimize with Copilot
 complexity:
   - Intermediate
 octicon: bug
@@ -25,7 +26,7 @@ When making requests to APIs, it's common to encounter rate limits that restrict
 
 The following Python code fetches weather data from an external API. If the API has rate limits, requests may fail when limits are exceeded, and your app may need a way to handle these responses gracefully by implementing retry logic.
 
-```python
+```python id=rate-limit-example
 from flask import Flask, request
 import requests
 
@@ -45,7 +46,9 @@ def get_weather():
 
 ## Example prompt
 
-`How can I handle API rate limits within get_weather().`
+```copilot copy prompt ref=rate-limit-example
+How can I handle API rate limits within get_weather().
+```
 
 ## Example response
 

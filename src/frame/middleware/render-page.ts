@@ -5,19 +5,16 @@ import { get } from 'lodash-es'
 
 import getMiniTocItems from '@/frame/lib/get-mini-toc-items'
 import patterns from '@/frame/lib/patterns'
-import { pathLanguagePrefixed } from '@/languages/lib/languages'
 import FailBot from '@/observability/lib/failbot'
 import statsd from '@/observability/lib/statsd'
 import type { ExtendedRequest } from '@/types'
 import { allVersions } from '@/versions/lib/all-versions'
 import { minimumNotFoundHtml } from '../lib/constants'
-import { setAppRouterContextHeaders } from '../lib/header-utils'
 import { defaultCacheControl } from './cache-control'
 import { isConnectionDropped } from './halt-on-dropped-connection'
 import { nextHandleRequest } from './next'
 
 const STATSD_KEY_RENDER = 'middleware.render_page'
-const STATSD_KEY_404 = 'middleware.render_404'
 
 async function buildRenderedPage(req: ExtendedRequest): Promise<string> {
   const { context } = req
@@ -31,7 +28,7 @@ async function buildRenderedPage(req: ExtendedRequest): Promise<string> {
   return (await pageRenderTimed(context)) as string
 }
 
-async function buildMiniTocItems(req: ExtendedRequest): Promise<string | undefined> {
+function buildMiniTocItems(req: ExtendedRequest) {
   const { context } = req
   if (!context) throw new Error('request not contextualized')
   const { page } = context
@@ -41,13 +38,13 @@ async function buildMiniTocItems(req: ExtendedRequest): Promise<string | undefin
     return
   }
 
-  return getMiniTocItems(context.renderedPage, 0)
+  return getMiniTocItems(context.renderedPage || '', 0)
 }
 
 export default async function renderPage(req: ExtendedRequest, res: Response) {
   // Skip if App Router has already handled this request
   if (res.locals?.handledByAppRouter) {
-    return // Request already handled by App Router
+    return
   }
 
   const { context } = req
@@ -70,36 +67,10 @@ export default async function renderPage(req: ExtendedRequest, res: Response) {
       )
     }
 
-    if (!pathLanguagePrefixed(req.path)) {
-      defaultCacheControl(res)
-      return res.status(404).type('html').send(minimumNotFoundHtml)
-    }
-
-    // The rest is "unhandled" requests where we don't have the page
-    // but the URL looks like a real page.
-
-    statsd.increment(STATSD_KEY_404, 1, [
-      `url:${req.url}`,
-      `path:${req.path}`,
-      `referer:${req.headers.referer || ''}`,
-    ])
-
+    // send minimal 404 at this point since we ran into hydration issues trying to pass
+    // these along to AppRouter 404 handling
     defaultCacheControl(res)
-
-    // For App Router migration: All language-prefixed 404s should use App Router
-    // Create a mock request that will be handled by App Router
-    const mockReq = Object.create(req)
-    mockReq.url = '/404'
-    mockReq.path = '/404'
-    mockReq.method = 'GET'
-
-    // Set context headers for App Router (preserves Fastly headers)
-    setAppRouterContextHeaders(req, res, true)
-
-    // Import nextApp and handle directly
-    const { nextApp } = await import('./next')
-    res.status(404)
-    return nextApp.getRequestHandler()(mockReq, res)
+    return res.status(404).type('html').send(minimumNotFoundHtml)
   }
 
   // Just finish fast without all the details like Content-Length
@@ -121,7 +92,7 @@ export default async function renderPage(req: ExtendedRequest, res: Response) {
 
   if (!req.context) throw new Error('request not contextualized')
   req.context.renderedPage = await buildRenderedPage(req)
-  req.context.miniTocItems = await buildMiniTocItems(req)
+  req.context.miniTocItems = buildMiniTocItems(req)
 
   // Stop processing if the connection was already dropped
   if (isConnectionDropped(req, res)) return
@@ -135,7 +106,7 @@ export default async function renderPage(req: ExtendedRequest, res: Response) {
       req.context.currentVersion === 'free-pro-team@latest' ||
       !allVersions[req.context.currentVersion!]
     ) {
-      page.fullTitle += ' - ' + context.site!.data.ui.header.github_docs
+      page.fullTitle += ` - ${context.site!.data.ui.header.github_docs}`
     } else {
       const { versionTitle } = allVersions[req.context.currentVersion!]
       page.fullTitle += ' - '
@@ -145,7 +116,7 @@ export default async function renderPage(req: ExtendedRequest, res: Response) {
       if (!versionTitle.includes('GitHub')) {
         page.fullTitle += 'GitHub '
       }
-      page.fullTitle += versionTitle + ' Docs'
+      page.fullTitle += `${versionTitle} Docs`
     }
   }
 

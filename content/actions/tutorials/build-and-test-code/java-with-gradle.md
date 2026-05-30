@@ -55,6 +55,7 @@ We recommend that you have a basic understanding of Java and the Gradle framewor
    If you don't find the "Java with Gradle" workflow template, copy the following workflow code to a new file called `gradle.yml` in the `.github/workflows` directory of your repository.
 
    ```yaml copy
+   {% data reusables.actions.actions-not-certified-by-github-comment %}
    name: Java CI with Gradle
 
    on:
@@ -78,7 +79,7 @@ We recommend that you have a basic understanding of Java and the Gradle framewor
            distribution: 'temurin'
 
        - name: Setup Gradle
-         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+         uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
 
        - name: Build with Gradle
          run: ./gradlew build
@@ -109,6 +110,7 @@ The workflow template will run the `build` task by default. In the default Gradl
 If you use different commands to build your project, or you want to use a different task, you can specify those. For example, you may want to run the `package` task that's configured in your `ci.gradle` file.
 
 ```yaml copy
+{% data reusables.actions.actions-not-certified-by-github-comment %}
 steps:
   - uses: {% data reusables.actions.action-checkout %}
   - uses: {% data reusables.actions.action-setup-java %}
@@ -117,7 +119,7 @@ steps:
       distribution: 'temurin'
 
   - name: Setup Gradle
-    uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
 
   - name: Build with Gradle
     run: ./gradlew -b ci.gradle package
@@ -136,6 +138,7 @@ After your build has succeeded and your tests have passed, you may want to uploa
 Gradle will usually create output files like JARs, EARs, or WARs in the `build/libs` directory. You can upload the contents of that directory using the `upload-artifact` action.
 
 ```yaml copy
+{% data reusables.actions.actions-not-certified-by-github-comment %}
 steps:
   - uses: {% data reusables.actions.action-checkout %}
   - uses: {% data reusables.actions.action-setup-java %}
@@ -144,7 +147,7 @@ steps:
       distribution: 'temurin'
 
   - name: Setup Gradle
-    uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
 
   - name: Build with Gradle
     run: ./gradlew build

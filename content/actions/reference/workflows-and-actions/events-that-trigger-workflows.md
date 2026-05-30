@@ -234,6 +234,27 @@ on:
   gollum
 ```
 
+## `image_version`
+
+| Webhook event payload | Activity types | `GITHUB_SHA` | `GITHUB_REF` |
+|----------------------| -------------- | ------------ | -------------|
+| Not applicable       | Not applicable | Last commit on default branch |  Default branch |
+
+Runs your workflow when a new version of a specified image becomes available for use. This event is typically triggered after a successful image version creation, allowing you to automate actions such as deployment or notifications in response to new image versions.
+
+This event supports glob patterns for both image names and versions. The example below triggers when a new image version matches any of the specified name and version combinations. For example, `["MyNewImage", 1.0.0]`, `["MyNewImage", 2.53.0]`, `["MyOtherImage", 1.0.0]`, and `["MyOtherImage", 2.0.0]`.
+
+```yaml
+on:
+  image_version:
+    names:
+    - "MyNewImage"
+    - "MyOtherImage"
+    versions:
+    - 1.*
+    - 2.*
+```
+
 ## `issue_comment`
 
 | Webhook event payload | Activity types | `GITHUB_SHA` | `GITHUB_REF` |
@@ -405,7 +426,7 @@ on:
 > * {% data reusables.actions.branch-requirement %}
 > * This event only occurs for projects owned by the workflow's repository, not for organization-owned or user-owned projects or for projects owned by another repository.
 
-Runs your workflow when a {% data variables.projects.projects_v1_board %} is created or modified. For activity related to cards or columns in a {% data variables.projects.projects_v1_board %}, use the [`project_card`](#project_card) or [`project_column`](#project_column) events instead. For more information about {% data variables.projects.projects_v1_boards %}, see [AUTOTITLE](/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards). For information about the {% data variables.projects.projects_v1_board %} APIs, see [AUTOTITLE](/graphql/reference/objects#project) in the GraphQL API documentation or [AUTOTITLE](/rest/projects).
+Runs your workflow when a {% data variables.projects.projects_v1_board %} is created or modified. For activity related to cards or columns in a {% data variables.projects.projects_v1_board %}, use the [`project_card`](#project_card) or [`project_column`](#project_column) events instead. For more information about {% data variables.projects.projects_v1_boards %}, see [AUTOTITLE](/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards). For information about the {% data variables.projects.projects_v1_board %} APIs, see [AUTOTITLE](/graphql/reference/objects#project) in the GraphQL API documentation or [AUTOTITLE](/rest/projects-classic).
 
 For example, you can run a workflow when a project has been `created` or `deleted`.
 
@@ -426,7 +447,7 @@ on:
 > * {% data reusables.actions.branch-requirement %}
 > * This event only occurs for projects owned by the workflow's repository, not for organization-owned or user-owned projects or for projects owned by another repository.
 
-Runs your workflow when a card on a {% data variables.projects.projects_v1_board %} is created or modified. For activity related to {% data variables.projects.projects_v1_boards %} or columns in a {% data variables.projects.projects_v1_board %}, use the [`project`](#project) or [`project_column`](#project_column) event instead. For more information about {% data variables.projects.projects_v1_boards %}, see [AUTOTITLE](/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards). For information about the project card APIs, see [AUTOTITLE](/graphql/reference/objects#projectcard) in the GraphQL API documentation or [AUTOTITLE](/rest/projects/cards).
+Runs your workflow when a card on a {% data variables.projects.projects_v1_board %} is created or modified. For activity related to {% data variables.projects.projects_v1_boards %} or columns in a {% data variables.projects.projects_v1_board %}, use the [`project`](#project) or [`project_column`](#project_column) event instead. For more information about {% data variables.projects.projects_v1_boards %}, see [AUTOTITLE](/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards). For information about the project card APIs, see [AUTOTITLE](/graphql/reference/objects#projectcard) in the GraphQL API documentation or [AUTOTITLE](/rest/projects-classic/cards).
 
 For example, you can run a workflow when a project card has been `created` or `deleted`.
 
@@ -447,7 +468,7 @@ on:
 > * {% data reusables.actions.branch-requirement %}
 > * This event only occurs for projects owned by the workflow's repository, not for organization-owned or user-owned projects or for projects owned by another repository.
 
-Runs your workflow when a column on a {% data variables.projects.projects_v1_board %} is created or modified. For activity related to {% data variables.projects.projects_v1_boards %} or cards in a {% data variables.projects.projects_v1_board %}, use the [`project`](#project) or [`project_card`](#project_card) event instead. For more information about {% data variables.projects.projects_v1_boards %}, see [AUTOTITLE](/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards). For information about the project column APIs, see [AUTOTITLE](/graphql/reference/objects#projectcolumn) in the GraphQL API documentation or [AUTOTITLE](/rest/projects#columns).
+Runs your workflow when a column on a {% data variables.projects.projects_v1_board %} is created or modified. For activity related to {% data variables.projects.projects_v1_boards %} or cards in a {% data variables.projects.projects_v1_board %}, use the [`project`](#project) or [`project_card`](#project_card) event instead. For more information about {% data variables.projects.projects_v1_boards %}, see [AUTOTITLE](/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards). For information about the project column APIs, see [AUTOTITLE](/graphql/reference/objects#projectcolumn) in the GraphQL API documentation or [AUTOTITLE](/rest/projects-classic#columns).
 
 For example, you can run a workflow when a project column has been `created` or `deleted`.
 
@@ -966,58 +987,44 @@ jobs:
 
 | Webhook event payload | Activity types | `GITHUB_SHA` | `GITHUB_REF` |
 | --------------------- | -------------- | ------------ | -------------|
-| Not applicable | Not applicable | Last commit on default branch | Default branch | When the scheduled workflow is set to run. A scheduled workflow uses [POSIX cron syntax](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07). For more information, see [AUTOTITLE](/actions/using-workflows#triggering-a-workflow-with-events). |
+| Not applicable | Not applicable | Last commit on default branch | Default branch |
 
 > [!NOTE]
 > * {% data reusables.actions.schedule-delay %}
-> * This event will only trigger a workflow run if the workflow file is on the default branch.
+> * {% data reusables.actions.branch-requirement %}
 > * Scheduled workflows will only run on the default branch.
 > * In a public repository, scheduled workflows are automatically disabled when no repository activity has occurred in 60 days. For information on re-enabling a disabled workflow, see [AUTOTITLE](/enterprise-server/actions/using-workflows/disabling-and-enabling-a-workflow#enabling-a-workflow).
-> * For an enterprise with {% data variables.product.prodname_emus %}, scheduled workflows will not run if the last `actor` associated with the scheduled workflow has been deprovisioned (and therefore become suspended) by the {% data variables.product.prodname_emu %} identity provider (IdP). However, if the last `actor` {% data variables.product.prodname_emu %} has not been deprovisioned by the IdP, and has only been removed as a member from a given organization in the enterprise, scheduled workflows will still run with that user set as the `actor`. Similarly, for an enterprise without {% data variables.product.prodname_emus %}, removing a user from an organization will not prevent scheduled workflows which had that user as their `actor` from running. Essentially, triggering a scheduled workflow requires that the status of the `actor` user account associated with the workflow is currently active (i.e. not suspended or deleted). Thus, the _user account's_ status, in both {% data variables.product.prodname_emu %} and non-{% data variables.product.prodname_emu %} scenarios, is what's important, _not_ the user's _membership status_ in the organization where the scheduled workflow is located.
-> * Certain repository events change the `actor` associated with the workflow. For example, a user who changes the default branch of the repository, which changes the branch on which scheduled workflows run, becomes `actor` for those scheduled workflows.
-> * For a deactivated scheduled workflow, if a user with `write` permissions to the repository makes a commit that changes the `cron` schedule on the workflow, the workflow will be reactivated, and that user will become the `actor` associated with any workflow runs. Note that, in this situation, the workflow is not reactivated by any change to the workflow file; you must alter the `cron` value in the workflow and commit this change.
->
->   **Example:**
->
->   ```yaml
->   on:
->     schedule:
->       - cron: "15 4,5 * * *"   # <=== Change this value
->   ```
 
 The `schedule` event allows you to trigger a workflow at a scheduled time.
 
+   **Example:**
+
+  ```yaml
+   on:
+     schedule:
+       - cron: "15 4,5 * * *"
+  ```
+
 {% data reusables.repositories.actions-scheduled-workflow-example %}
-
-Cron syntax has five fields separated by a space, and each field represents a unit of time.
-
-```text
-┌───────────── minute (0 - 59)
-│ ┌───────────── hour (0 - 23)
-│ │ ┌───────────── day of the month (1 - 31)
-│ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
-│ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
-│ │ │ │ │
-│ │ │ │ │
-│ │ │ │ │
-* * * * *
-```
-
-You can use these operators in any of the five fields:
-
-| Operator | Description | Example |
-| -------- | ----------- | ------- |
-| * | Any value | `15 * * * *` runs at every minute 15 of every hour of every day. |
-| , | Value list separator | `2,10 4,5 * * *` runs at minute 2 and 10 of the 4th and 5th hour of every day. |
-| - | Range of values | `30 4-6 * * *` runs at minute 30 of the 4th, 5th, and 6th hour. |
-| / | Step values | `20/15 * * * *` runs every 15 minutes starting from minute 20 through 59 (minutes 20, 35, and 50). |
 
 > [!NOTE]
 > {% data variables.product.prodname_actions %} does not support the non-standard syntax `@yearly`, `@monthly`, `@weekly`, `@daily`, `@hourly`, and `@reboot`.
 
 You can use [crontab guru](https://crontab.guru/) to help generate your cron syntax and confirm what time it will run. To help you get started, there is also a list of [crontab guru examples](https://crontab.guru/examples.html).
 
-Notifications for scheduled workflows are sent to the user who last modified the cron syntax in the workflow file. For more information, see [AUTOTITLE](/actions/monitoring-and-troubleshooting-workflows/notifications-for-workflow-runs).
+### `actor` for scheduled workflows
+
+Certain repository events change the `actor` associated with the workflow. For example, a user who changes the default branch of the repository, which changes the branch on which scheduled workflows run, becomes `actor` for those scheduled workflows.
+
+For a deactivated scheduled workflow, if a user with `write` permissions to the repository makes a commit that changes the `cron` schedule on the workflow, the workflow will be reactivated, and that user will become the `actor` associated with any workflow runs.
+
+Notifications for scheduled workflows are sent to the user who last modified the cron syntax in the workflow file.  For more information, see [AUTOTITLE](/actions/monitoring-and-troubleshooting-workflows/notifications-for-workflow-runs).
+
+> [!NOTE]
+> For an enterprise with {% data variables.product.prodname_emus %}, triggering a scheduled workflow requires that the status of the `actor` user account associated with the workflow is currently active (i.e. not suspended or deleted).
+> * Scheduled workflows will not run if the last `actor` associated with the scheduled workflow has been deprovisioned by the {% data variables.product.prodname_emu %} identity provider (IdP). However, if the last `actor` {% data variables.product.prodname_emu %} has not been deprovisioned by the IdP, and has only been removed as a member from a given organization in the enterprise, scheduled workflows will still run with that user set as the `actor`.
+> * Similarly, for an enterprise without {% data variables.product.prodname_emus %}, removing a user from an organization will not prevent scheduled workflows which had that user as their `actor` from running.
+> * Thus, the _user account's_ status, in both {% data variables.product.prodname_emu %} and non-{% data variables.product.prodname_emu %} scenarios, is what's important, _not_ the user's _membership status_ in the organization where the scheduled workflow is located.
 
 ## `status`
 
@@ -1173,6 +1180,8 @@ For more information, see the {% data variables.product.prodname_cli %} informat
 
 This event occurs when a workflow run is requested or completed. It allows you to execute a workflow based on execution or completion of another workflow. The workflow started by the `workflow_run` event is able to access secrets and write tokens, even if the previous workflow was not. This is useful in cases where the previous workflow is intentionally not privileged, but you need to take a privileged action in a later workflow.
 
+{% data reusables.actions.workflow-run-permissions-warning %}
+
 In this example, a workflow is configured to run after the separate "Run Tests" workflow completes.
 
 ```yaml
@@ -1299,7 +1308,7 @@ jobs:
             fs.writeFileSync(path.join(temp, 'pr_number.zip'), Buffer.from(download.data));
 
       - name: 'Unzip artifact'
-        run: unzip pr_number.zip -d "{% raw %}${{ runner.temp }}{% endraw %}/artifacts"
+        run: unzip "{% raw %}${{ runner.temp }}{% endraw %}/artifacts/pr_number.zip" -d "{% raw %}${{ runner.temp }}{% endraw %}/artifacts"
 
       - name: 'Comment on PR'
         uses: {% data reusables.actions.action-github-script %}
