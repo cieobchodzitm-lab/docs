@@ -29,6 +29,39 @@ jobs:
       - name: Disable Next.js telemetry
         run: npx next telemetry disable
 
+      - name: Install headless browser
+        run: npx playwright install --no-shell
+
+      # The Playwright test, with the env vars we set here, takes care of
+      # starting a server and shutting it down when it's done.
+      # That's why it's important this step comes before the `npm start &`
+      # step below.
+      - name: Run Playwright tests
+        env:
+          # This is what local dev contributors are expected to do.
+          PLAYWRIGHT_START_SERVER_COMMAND: 'npm start'
+          # This is so that timeouts aren't retried, which can lead to
+          # tests not exiting at the end with a non-zero. Otherwise,
+          # by default failures are marked as "flaky" instead of "failed".
+          PLAYWRIGHT_RETRIES: 0
+          TEST_EARLY_ACCESS: ${{ github.repository == 'github/docs-internal' }}
+          NODE_OPTIONS: '--no-experimental-strip-types'
+        run: npm run playwright-test -- playwright-local-dev
+
+      - name: Start server in the background
+        run: npm start > /tmp/stdout.log 2> /tmp/stderr.log &
+
+      - name: View the home page
+        run: |
+          echo "Going to sleep a little to wait for the server to start"
+          sleep 10
+          curl --fail --retry-connrefused --retry 5 http://localhost:4000/
+
+      - name: Run basic tests
+        run: npm run test-local-dev
+
+      - if: ${{ failure() }}
+        name: Debug server outputs on errors
       - name: Start server and basic smoke test
         run: |
           # Start server in background
